@@ -36,11 +36,7 @@ function minus() {
 }
  
 function mute() {
-        if [ $MUTE_STATE = no ]; then
-                pactl set-sink-mute $SINK_NAME 1
-        elif [ $MUTE_STATE = yes ]; then
-                pactl set-sink-mute $SINK_NAME 0
-        fi
+        pactl set-sink-mute $SINK_NAME toggle
 }
  
 function get() {
