@@ -9,7 +9,8 @@
 SINK_NAME=$(pacmd dump | perl -a -n -e 'print $F[1] if /set-default-sink/')
 # try this line instead of the one above if you got problems with the detection of your default sink.
 #SINK_NAME=$(pactl stat | grep "alsa_output" | perl -a -n -e 'print $F[2]')
- 
+SOURCE_NAME=$(pacmd dump | perl -a -n -e 'print $F[1] if /set-default-source/')
+
 # set max allowed volume; 0x10000 = 100%
 VOL_MAX="0x10000"
  
@@ -18,6 +19,7 @@ VOL_STEP=$((VOL_MAX / STEPS))
  
 VOL_NOW=`pacmd dump | grep -P "^set-sink-volume $SINK_NAME\s+" | perl -p -n -e 's/.+\s(.x.+)$/$1/'`
 MUTE_STATE=`pacmd dump | grep -P "^set-sink-mute $SINK_NAME\s+" | perl -p -n -e 's/.+\s(yes|no)$/$1/'`
+MIC_MUTE_STATE=`pacmd dump | grep -P "^set-source-mute $SINK_NAME\s+" | perl -p -n -e 's/.+\s(yes|no)$/$1/'`
  
 function plus() {
         VOL_NEW=$((VOL_NOW + VOL_STEP))
@@ -38,7 +40,11 @@ function minus() {
 function mute() {
         pactl set-sink-mute $SINK_NAME toggle
 }
- 
+
+function micmute() {
+        pactl set-source-mute $SOURCE_NAME toggle
+}
+
 function get() {
         BAR=""
         if [ $MUTE_STATE = yes ]; then
@@ -76,4 +82,7 @@ case "$1" in
         ;;
         get)
                 get
+        ;;
+        micmute)
+                micmute
 esac
